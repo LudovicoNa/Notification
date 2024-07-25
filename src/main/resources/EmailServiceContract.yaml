@@ -1,0 +1,106 @@
+openapi: 3.0.0
+info:
+  title: Email Notification Service API
+  version: 1.0.0
+  description: API per gestire le notifiche via email
+
+paths:
+  /email-notifications:
+    post:
+      summary: Invia una notifica via email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailNotificationRequest'
+      responses:
+        '200':
+          description: Notifica inviata con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailNotificationResponse'
+        '400':
+          description: Richiesta non valida
+
+  /email-notifications/{recipient}:
+    get:
+      summary: Ottieni notifiche email per un destinatario
+      parameters:
+        - name: recipient
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'indirizzo email del destinatario
+      responses:
+        '200':
+          description: Lista di notifiche email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEmailNotificationsResponse'
+        '404':
+          description: Nessuna notifica trovata per il destinatario
+
+components:
+  schemas:
+    EmailNotification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID univoco della notifica email
+        recipient:
+          type: string
+          description: Destinatario della notifica email
+        subject:
+          type: string
+          description: Oggetto dell'email
+        body:
+          type: string
+          description: Corpo dell'email
+        sentAt:
+          type: string
+          format: date-time
+          description: Data e ora di invio
+        success:
+          type: boolean
+          description: Stato di successo dell'invio
+        errorMessage:
+          type: string
+          description: Messaggio di errore in caso di fallimento
+
+    SendEmailNotificationRequest:
+      type: object
+      properties:
+        recipient:
+          type: string
+          description: Destinatario della notifica email
+        subject:
+          type: string
+          description: Oggetto dell'email
+        body:
+          type: string
+          description: Corpo dell'email
+      required:
+        - recipient
+        - subject
+        - body
+
+    SendEmailNotificationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Stato di successo dell'invio
+
+    GetEmailNotificationsResponse:
+      type: object
+      properties:
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailNotification'
